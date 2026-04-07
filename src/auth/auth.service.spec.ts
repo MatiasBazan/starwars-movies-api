@@ -1,4 +1,4 @@
-import { ConflictException, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as bcrypt from 'bcryptjs';
@@ -75,6 +75,55 @@ describe('AuthService', () => {
           password: 'password123',
         }),
       ).rejects.toThrow(ConflictException);
+    });
+  });
+
+  describe('registerAdmin', () => {
+    const adminDto = {
+      email: 'admin@example.com',
+      username: 'adminuser',
+      password: 'password123',
+      adminSecret: 'correct-secret',
+    };
+
+    beforeEach(() => {
+      process.env.ADMIN_SECRET = 'correct-secret';
+    });
+
+    afterEach(() => {
+      delete process.env.ADMIN_SECRET;
+    });
+
+    it('should register an admin user successfully', async () => {
+      const adminUser = { ...mockUser, role: Role.ADMIN };
+      usersService.findByEmail.mockResolvedValue(null);
+      usersService.create.mockResolvedValue(adminUser);
+
+      const result = await service.registerAdmin(adminDto);
+
+      expect(result.access_token).toBe('mock_token');
+      expect(result.user).not.toHaveProperty('password');
+      expect(usersService.create).toHaveBeenCalledWith(
+        expect.objectContaining({ email: adminDto.email, role: Role.ADMIN }),
+      );
+    });
+
+    it('should throw ForbiddenException if adminSecret is wrong', async () => {
+      await expect(
+        service.registerAdmin({ ...adminDto, adminSecret: 'wrong-secret' }),
+      ).rejects.toThrow(ForbiddenException);
+    });
+
+    it('should throw ForbiddenException if ADMIN_SECRET env var is not set', async () => {
+      delete process.env.ADMIN_SECRET;
+
+      await expect(service.registerAdmin(adminDto)).rejects.toThrow(ForbiddenException);
+    });
+
+    it('should throw ConflictException if email already exists', async () => {
+      usersService.findByEmail.mockResolvedValue(mockUser);
+
+      await expect(service.registerAdmin(adminDto)).rejects.toThrow(ConflictException);
     });
   });
 

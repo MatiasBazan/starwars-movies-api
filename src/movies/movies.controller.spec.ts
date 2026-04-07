@@ -39,7 +39,7 @@ describe('MoviesController', () => {
 
   it('findAll should call MoviesService.findAll with parsed page and limit', async () => {
     const result = await controller.findAll('1', '10');
-    expect(mockMoviesService.findAll).toHaveBeenCalledWith(1, 10);
+    expect(mockMoviesService.findAll).toHaveBeenCalledWith(1, 10, { title: undefined, director: undefined, episode: undefined });
     expect(result.data).toHaveLength(1);
   });
 

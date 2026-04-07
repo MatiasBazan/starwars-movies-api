@@ -1,7 +1,7 @@
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { QueryFailedError, Repository } from 'typeorm';
 import { MoviesService } from './movies.service';
 import { Movie } from './entities/movie.entity';
 
@@ -25,12 +25,23 @@ const mockMovie: Movie = {
 
 type MockRepository<T> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 
+const createMockQueryBuilder = (result: [Movie[], number]) => {
+  const qb: any = {
+    orderBy: jest.fn().mockReturnThis(),
+    skip: jest.fn().mockReturnThis(),
+    take: jest.fn().mockReturnThis(),
+    andWhere: jest.fn().mockReturnThis(),
+    getManyAndCount: jest.fn().mockResolvedValue(result),
+  };
+  return qb;
+};
+
 const createMockRepository = <T>(): MockRepository<T> => ({
-  findAndCount: jest.fn(),
   findOne: jest.fn(),
   create: jest.fn(),
   save: jest.fn(),
   remove: jest.fn(),
+  createQueryBuilder: jest.fn(),
 });
 
 describe('MoviesService', () => {
@@ -51,8 +62,9 @@ describe('MoviesService', () => {
   });
 
   describe('findAll', () => {
-    it('should return a paginated list of movies', async () => {
-      repo.findAndCount!.mockResolvedValue([[mockMovie], 1]);
+    it('should return a paginated list of movies without filters', async () => {
+      const qb = createMockQueryBuilder([[mockMovie], 1]);
+      (repo.createQueryBuilder as jest.Mock).mockReturnValue(qb);
 
       const result = await service.findAll(1, 10);
 
@@ -60,6 +72,43 @@ describe('MoviesService', () => {
       expect(result.total).toBe(1);
       expect(result.page).toBe(1);
       expect(result.limit).toBe(10);
+      expect(qb.andWhere).not.toHaveBeenCalled();
+    });
+
+    it('should filter by title using ILIKE', async () => {
+      const qb = createMockQueryBuilder([[mockMovie], 1]);
+      (repo.createQueryBuilder as jest.Mock).mockReturnValue(qb);
+
+      await service.findAll(1, 10, { title: 'hope' });
+
+      expect(qb.andWhere).toHaveBeenCalledWith('movie.title ILIKE :title', { title: '%hope%' });
+    });
+
+    it('should filter by director using ILIKE', async () => {
+      const qb = createMockQueryBuilder([[mockMovie], 1]);
+      (repo.createQueryBuilder as jest.Mock).mockReturnValue(qb);
+
+      await service.findAll(1, 10, { director: 'lucas' });
+
+      expect(qb.andWhere).toHaveBeenCalledWith('movie.director ILIKE :director', { director: '%lucas%' });
+    });
+
+    it('should filter by episodeId exactly', async () => {
+      const qb = createMockQueryBuilder([[mockMovie], 1]);
+      (repo.createQueryBuilder as jest.Mock).mockReturnValue(qb);
+
+      await service.findAll(1, 10, { episode: '4' });
+
+      expect(qb.andWhere).toHaveBeenCalledWith('movie.episodeId = :episodeId', { episodeId: 4 });
+    });
+
+    it('should apply multiple filters together', async () => {
+      const qb = createMockQueryBuilder([[mockMovie], 1]);
+      (repo.createQueryBuilder as jest.Mock).mockReturnValue(qb);
+
+      await service.findAll(1, 10, { title: 'hope', director: 'lucas', episode: '4' });
+
+      expect(qb.andWhere).toHaveBeenCalledTimes(3);
     });
   });
 
@@ -109,6 +158,28 @@ describe('MoviesService', () => {
       const result = await service.update('uuid-1', { director: 'Someone Else' });
 
       expect(result.director).toBe('Someone Else');
+    });
+
+    it('should throw ConflictException on duplicate title (PostgreSQL error 23505)', async () => {
+      repo.findOne!.mockResolvedValue(mockMovie);
+      const dbError = Object.assign(
+        new QueryFailedError('UPDATE', [], new Error()),
+        { code: '23505' },
+      );
+      repo.save!.mockRejectedValue(dbError);
+
+      await expect(service.update('uuid-1', { title: 'A New Hope' })).rejects.toThrow(
+        ConflictException,
+      );
+    });
+
+    it('should rethrow unknown errors from save', async () => {
+      repo.findOne!.mockResolvedValue(mockMovie);
+      repo.save!.mockRejectedValue(new Error('unexpected db error'));
+
+      await expect(service.update('uuid-1', { director: 'X' })).rejects.toThrow(
+        'unexpected db error',
+      );
     });
   });
 

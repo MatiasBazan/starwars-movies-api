@@ -3,6 +3,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { RegisterAdminDto } from './dto/register-admin.dto';
 import { Public } from './decorators/public.decorator';
 
 @ApiTags('auth')
@@ -17,6 +18,16 @@ export class AuthController {
   @ApiResponse({ status: 409, description: 'Email already in use' })
   register(@Body() dto: RegisterDto) {
     return this.authService.register(dto);
+  }
+
+  @Public()
+  @Post('register-admin')
+  @ApiOperation({ summary: 'Register a new admin user' })
+  @ApiResponse({ status: 201, description: 'Admin user registered successfully' })
+  @ApiResponse({ status: 403, description: 'Invalid admin secret' })
+  @ApiResponse({ status: 409, description: 'Email already in use' })
+  registerAdmin(@Body() dto: RegisterAdminDto) {
+    return this.authService.registerAdmin(dto);
   }
 
   @Public()

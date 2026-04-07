@@ -76,7 +76,9 @@ npm run test:watch
 | Method | Path | Auth Required | Role |
 |--------|------|---------------|------|
 | POST | /auth/register | No | — |
+| POST | /auth/register-admin | No | — |
 | POST | /auth/login | No | — |
+| GET | /users/me | Yes (Bearer) | USER, ADMIN |
 | GET | /movies | No | — |
 | GET | /movies/:id | Yes (Bearer) | USER, ADMIN |
 | POST | /movies | Yes (Bearer) | ADMIN |
@@ -84,11 +86,14 @@ npm run test:watch
 | DELETE | /movies/:id | Yes (Bearer) | ADMIN |
 | POST | /movies/sync | Yes (Bearer) | ADMIN |
 
-### Pagination
+### Pagination & Filters
 
 `GET /movies` supports optional query params:
 - `?page=1` (default: 1)
 - `?limit=10` (default: 10)
+- `?title=hope` — partial case-insensitive title search
+- `?director=lucas` — partial case-insensitive director search
+- `?episode=4` — exact episode number filter
 
 ### SWAPI Sync
 
@@ -108,7 +113,7 @@ Includes Bearer authentication — click **Authorize** and paste your JWT token.
 src/
 ├── auth/
 │   ├── decorators/        # @Public(), @Roles(), @CurrentUser()
-│   ├── dto/               # login.dto.ts, register.dto.ts
+│   ├── dto/               # login.dto.ts, register.dto.ts, register-admin.dto.ts
 │   ├── guards/            # jwt-auth.guard.ts, roles.guard.ts
 │   ├── strategies/        # jwt.strategy.ts
 │   ├── auth.controller.ts
@@ -117,10 +122,11 @@ src/
 ├── users/
 │   ├── dto/               # create-user.dto.ts
 │   ├── entities/          # user.entity.ts, role.enum.ts
+│   ├── users.controller.ts
 │   ├── users.module.ts
 │   └── users.service.ts
 ├── movies/
-│   ├── dto/               # create-movie.dto.ts, update-movie.dto.ts
+│   ├── dto/               # create-movie.dto.ts, update-movie.dto.ts, query-movie.dto.ts
 │   ├── entities/          # movie.entity.ts
 │   ├── movies.controller.ts
 │   ├── movies.module.ts
@@ -148,3 +154,4 @@ src/
 | `JWT_EXPIRATION` | JWT token expiration | `1d` |
 | `SWAPI_BASE_URL` | SWAPI base URL | `https://www.swapi.tech/api` |
 | `PORT` | HTTP server port | `3000` |
+| `ADMIN_SECRET` | Secret required to register admin users | — (required) |

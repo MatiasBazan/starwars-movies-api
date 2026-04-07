@@ -39,14 +39,21 @@ export class MoviesController {
   @ApiOperation({ summary: 'Get all movies (public, paginated)' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'title', required: false, type: String, description: 'Partial case-insensitive title filter' })
+  @ApiQuery({ name: 'director', required: false, type: String, description: 'Partial case-insensitive director filter' })
+  @ApiQuery({ name: 'episode', required: false, type: Number, description: 'Exact episodeId filter' })
   @ApiResponse({ status: 200, description: 'List of movies' })
   findAll(
     @Query('page') page?: string,
     @Query('limit') limit?: string,
+    @Query('title') title?: string,
+    @Query('director') director?: string,
+    @Query('episode') episode?: string,
   ) {
     return this.moviesService.findAll(
       page ? parseInt(page, 10) : 1,
       limit ? parseInt(limit, 10) : 10,
+      { title, director, episode },
     );
   }
 
@@ -75,6 +82,7 @@ export class MoviesController {
   @ApiOperation({ summary: 'Update a movie (ADMIN only)' })
   @ApiResponse({ status: 200, description: 'Movie updated' })
   @ApiResponse({ status: 404, description: 'Movie not found' })
+  @ApiResponse({ status: 409, description: 'Title already exists' })
   update(@Param('id') id: string, @Body() dto: UpdateMovieDto) {
     return this.moviesService.update(id, dto);
   }
