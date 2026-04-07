@@ -7,7 +7,7 @@ export class RegisterDto {
   @IsNotEmpty()
   email: string;
 
-  @ApiProperty({ example: 'johndoe' })
+  @ApiProperty({ example: 'userexample' })
   @IsString()
   @IsNotEmpty()
   @MinLength(3)
