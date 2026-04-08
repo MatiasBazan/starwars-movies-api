@@ -99,7 +99,7 @@ npm run test:watch
 
 `POST /movies/sync` fetches all films from `https://www.swapi.tech/api/films` and upserts them into the database.
 
-A cron job runs the same sync automatically every day at **3:00 AM**.
+A cron job runs the same sync automatically every day at **1:00 AM**.
 
 ## Swagger Documentation
 

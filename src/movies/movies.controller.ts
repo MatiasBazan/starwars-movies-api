@@ -107,7 +107,7 @@ export class MoviesController {
     return this.swapiService.syncMovies();
   }
 
-  @Cron('0 3 * * *')
+  @Cron('0 1 * * *')
   async handleCronSync() {
     await this.swapiService.syncMovies();
   }
