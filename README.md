@@ -1,163 +1,163 @@
 # Star Wars Movies API
 
-Backend REST API built with NestJS for managing Star Wars movies, with JWT authentication, role-based access control, and automatic synchronization from SWAPI.
+API REST backend construida con NestJS para gestionar películas de Star Wars, con autenticación JWT, control de acceso por roles y sincronización automática desde SWAPI.
 
-## Live Deploy
+## Deploy en producción
 
 | | URL |
 |--|--|
 | **API Base** | https://starwars-movies-api.up.railway.app |
-| **Swagger Docs** | https://starwars-movies-api.up.railway.app/api/docs |
+| **Documentación Swagger** | https://starwars-movies-api.up.railway.app/api/docs |
 
-### Test Credentials
+### Credenciales de prueba
 
-**Regular user** (role: `user`):
+**Usuario regular** (rol: `user`):
 ```
 email:    user@conexa.com
 password: Test1234!
 ```
 
-**Admin user** (role: `admin`):
+**Usuario administrador** (rol: `admin`):
 ```
 email:    admin@conexa.com
 password: Admin1234!
 ```
 
-**Admin Secret** (required to register new admin users via `POST /auth/register-admin`):
+**Admin Secret** (requerido para registrar nuevos administradores vía `POST /auth/register-admin`):
 ```
 conexa-admin-2026
 ```
 
-> **Tip:** Use `POST /auth/login` with the credentials above, then copy the `access_token` and click **Authorize** in Swagger.
+> **Tip:** Usá `POST /auth/login` con las credenciales de arriba, copiá el `access_token` y hacé clic en **Authorize** en Swagger.
 
-## Technologies
+## Tecnologías
 
-- **NestJS** — Node.js framework
-- **TypeORM** — ORM for PostgreSQL
-- **PostgreSQL** — Database
-- **JWT + Passport** — Authentication
-- **class-validator / class-transformer** — DTO validation and serialization
-- **@nestjs/swagger** — Swagger/OpenAPI documentation
-- **bcryptjs** — Password hashing
-- **@nestjs/schedule** — Cron jobs for automatic SWAPI sync
+- **NestJS** — Framework de Node.js
+- **TypeORM** — ORM para PostgreSQL
+- **PostgreSQL** — Base de datos
+- **JWT + Passport** — Autenticación
+- **class-validator / class-transformer** — Validación y serialización de DTOs
+- **@nestjs/swagger** — Documentación Swagger/OpenAPI
+- **bcryptjs** — Hashing de contraseñas
+- **@nestjs/schedule** — Cron jobs para sincronización automática con SWAPI
 
-## Prerequisites
+## Requisitos previos
 
 - Node.js 18+
 - npm
-- PostgreSQL running locally (or accessible via network)
+- PostgreSQL corriendo localmente (o accesible por red)
 
-## Installation
+## Instalación
 
 ```bash
 npm install
 ```
 
-## Database Setup
+## Configuración de la base de datos
 
-1. Create a PostgreSQL database:
+1. Crear una base de datos PostgreSQL:
 ```sql
 CREATE DATABASE starwars_movies;
 ```
 
-2. Copy the environment file and fill in your values:
+2. Copiar el archivo de entorno y completar los valores:
 ```bash
 cp .env.example .env
 ```
 
-3. Edit `.env` with your database credentials and JWT secret.
+3. Editar `.env` con las credenciales de la base de datos y el JWT secret.
 
-## Running the App
+## Ejecutar la aplicación
 
 ```bash
-# Development (watch mode)
+# Desarrollo (modo watch)
 npm run start:dev
 
-# Production build
+# Build de producción
 npm run build
 npm run start:prod
 ```
 
-The server will log:
+El servidor loguea al iniciar:
 ```
 Application running on: http://localhost:3000
 Swagger docs: http://localhost:3000/api/docs
 ```
 
-> **Note:** `synchronize: true` is enabled for development — TypeORM will auto-create/update tables. In production, set `synchronize: false` and use TypeORM migrations.
+> **Nota:** `synchronize: true` está habilitado para desarrollo — TypeORM crea/actualiza las tablas automáticamente. En producción usar `synchronize: false` y migraciones de TypeORM.
 
-## Running Tests
+## Ejecutar tests
 
 ```bash
-# Unit tests
+# Tests unitarios
 npm run test
 
-# Unit tests with coverage
+# Tests con cobertura
 npm run test:cov
 
-# Watch mode
+# Modo watch
 npm run test:watch
 ```
 
-## API Endpoints
+## Endpoints de la API
 
-| Method | Path | Auth Required | Role |
-|--------|------|---------------|------|
+| Método | Ruta | Autenticación | Rol |
+|--------|------|---------------|-----|
 | POST | /auth/register | No | — |
 | POST | /auth/register-admin | No | — |
 | POST | /auth/login | No | — |
-| GET | /users/me | Yes (Bearer) | USER, ADMIN |
+| GET | /users/me | Sí (Bearer) | USER, ADMIN |
 | GET | /movies | No | — |
-| GET | /movies/:id | Yes (Bearer) | USER, ADMIN |
-| POST | /movies | Yes (Bearer) | ADMIN |
-| PATCH | /movies/:id | Yes (Bearer) | ADMIN |
-| DELETE | /movies/:id | Yes (Bearer) | ADMIN |
-| POST | /movies/sync | Yes (Bearer) | ADMIN |
+| GET | /movies/:id | Sí (Bearer) | USER, ADMIN |
+| POST | /movies | Sí (Bearer) | ADMIN |
+| PATCH | /movies/:id | Sí (Bearer) | ADMIN |
+| DELETE | /movies/:id | Sí (Bearer) | ADMIN |
+| POST | /movies/sync | Sí (Bearer) | ADMIN |
 
-### Pagination & Filters
+### Paginación y filtros
 
-`GET /movies` supports optional query params:
-- `?page=1` (default: 1)
-- `?limit=10` (default: 10)
-- `?title=hope` — partial case-insensitive title search
-- `?director=lucas` — partial case-insensitive director search
-- `?episode=4` — exact episode number filter
+`GET /movies` acepta query params opcionales:
+- `?page=1` (por defecto: 1)
+- `?limit=10` (por defecto: 10)
+- `?title=hope` — búsqueda parcial por título (case-insensitive)
+- `?director=lucas` — búsqueda parcial por director (case-insensitive)
+- `?episode=4` — filtro exacto por número de episodio
 
-### SWAPI Sync
+### Sincronización con SWAPI
 
-`POST /movies/sync` fetches all films from `https://www.swapi.tech/api/films` and upserts them into the database.
+`POST /movies/sync` obtiene todas las películas de `https://www.swapi.tech/api/films` y las sincroniza en la base de datos (upsert).
 
-A cron job runs the same sync automatically every day at **1:00 AM**.
+Un cron job ejecuta la misma sincronización automáticamente todos los días a la **1:00 AM**.
 
-## Postman Collection
+## Colección de Postman
 
-The file `postman_collection.json` is included at the root of the project.
+El archivo `postman_collection.json` está incluido en la raíz del proyecto.
 
-**How to import:**
+**Cómo importar:**
 
-1. Open Postman.
-2. Click **File → Import** (or press `Ctrl+O` / `Cmd+O`).
-3. Select `postman_collection.json` from the project root.
-4. The collection **"Star Wars Movies API"** will appear in your sidebar.
+1. Abrir Postman.
+2. Hacer clic en **File → Import** (o `Ctrl+O` / `Cmd+O`).
+3. Seleccionar `postman_collection.json` desde la raíz del proyecto.
+4. La colección **"Star Wars Movies API"** aparecerá en el sidebar.
 
-**How to authenticate:**
+**Cómo autenticarse:**
 
-1. Run **POST /auth/login** (or **POST /auth/register**).
-2. Copy the `access_token` value from the response.
-3. Click the collection name → **Variables** tab.
-4. Paste the token into the `token` variable (Current Value column).
-5. All requests that require a Bearer token will pick it up automatically via `{{token}}`.
+1. Ejecutar **POST /auth/login** con las credenciales de prueba.
+2. Copiar el valor de `access_token` de la respuesta.
+3. Hacer clic en el nombre de la colección → pestaña **Variables**.
+4. Pegar el token en la variable `token` (columna Current Value).
+5. Todos los requests que requieren Bearer token lo tomarán automáticamente vía `{{token}}`.
 
 ---
 
-## Swagger Documentation
+## Documentación Swagger
 
-- **Production:** https://starwars-movies-api.up.railway.app/api/docs
+- **Producción:** https://starwars-movies-api.up.railway.app/api/docs
 - **Local:** `http://localhost:3000/api/docs`
 
-Includes Bearer authentication — click **Authorize** and paste your JWT token.
+Incluye autenticación Bearer — hacer clic en **Authorize** y pegar el JWT token.
 
-## Project Structure
+## Estructura del proyecto
 
 ```
 src/
@@ -189,20 +189,19 @@ src/
 │   └── interceptors/      # transform.interceptor.ts
 ├── app.module.ts
 └── main.ts
-
 ```
 
-## Environment Variables
+## Variables de entorno
 
-| Variable | Description | Default |
+| Variable | Descripción | Default |
 |----------|-------------|---------|
-| `DB_HOST` | PostgreSQL host | `localhost` |
-| `DB_PORT` | PostgreSQL port | `5432` |
-| `DB_USERNAME` | PostgreSQL user | `postgres` |
-| `DB_PASSWORD` | PostgreSQL password | `postgres` |
-| `DB_NAME` | Database name | `starwars_movies` |
-| `JWT_SECRET` | Secret key for JWT signing | — (required) |
-| `JWT_EXPIRATION` | JWT token expiration | `1d` |
-| `SWAPI_BASE_URL` | SWAPI base URL | `https://www.swapi.tech/api` |
-| `PORT` | HTTP server port | `3000` |
-| `ADMIN_SECRET` | Secret required to register admin users | — (required) |
+| `DB_HOST` | Host de PostgreSQL | `localhost` |
+| `DB_PORT` | Puerto de PostgreSQL | `5432` |
+| `DB_USERNAME` | Usuario de PostgreSQL | `postgres` |
+| `DB_PASSWORD` | Contraseña de PostgreSQL | `postgres` |
+| `DB_NAME` | Nombre de la base de datos | `starwars_movies` |
+| `JWT_SECRET` | Clave secreta para firmar JWT | — (requerido) |
+| `JWT_EXPIRATION` | Expiración del token JWT | `1d` |
+| `SWAPI_BASE_URL` | URL base de SWAPI | `https://www.swapi.tech/api` |
+| `PORT` | Puerto HTTP del servidor | `3000` |
+| `ADMIN_SECRET` | Secreto para registrar usuarios admin | — (requerido) |
