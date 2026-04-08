@@ -2,6 +2,34 @@
 
 Backend REST API built with NestJS for managing Star Wars movies, with JWT authentication, role-based access control, and automatic synchronization from SWAPI.
 
+## Live Deploy
+
+| | URL |
+|--|--|
+| **API Base** | https://starwars-movies-api.up.railway.app |
+| **Swagger Docs** | https://starwars-movies-api.up.railway.app/api/docs |
+
+### Test Credentials
+
+**Regular user** (role: `user`):
+```
+email:    user@conexa.com
+password: Test1234!
+```
+
+**Admin user** (role: `admin`):
+```
+email:    admin@conexa.com
+password: Admin1234!
+```
+
+**Admin Secret** (required to register new admin users via `POST /auth/register-admin`):
+```
+conexa-admin-2026
+```
+
+> **Tip:** Use `POST /auth/login` with the credentials above, then copy the `access_token` and click **Authorize** in Swagger.
+
 ## Technologies
 
 - **NestJS** — Node.js framework
@@ -124,7 +152,8 @@ The file `postman_collection.json` is included at the root of the project.
 
 ## Swagger Documentation
 
-Available at: `http://localhost:3000/api/docs`
+- **Production:** https://starwars-movies-api.up.railway.app/api/docs
+- **Local:** `http://localhost:3000/api/docs`
 
 Includes Bearer authentication — click **Authorize** and paste your JWT token.
 
