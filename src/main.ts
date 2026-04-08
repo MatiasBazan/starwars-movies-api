@@ -37,7 +37,29 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
-  app.getHttpAdapter().get('/', (_req, res: any) => res.redirect('/api/docs'));
+  app.getHttpAdapter().get('/', (_req, res: any) => {
+    res.json({
+      name: 'Star Wars Movies API',
+      version: '1.0',
+      docs: '/api/docs',
+      endpoints: {
+        auth: [
+          'POST /auth/register',
+          'POST /auth/login',
+          'POST /auth/register-admin',
+        ],
+        users: ['GET /users/me'],
+        movies: [
+          'GET /movies',
+          'GET /movies/:id',
+          'POST /movies',
+          'PATCH /movies/:id',
+          'DELETE /movies/:id',
+          'POST /movies/sync',
+        ],
+      },
+    });
+  });
 
   const port = process.env.PORT ?? 3000;
   await app.listen(port);

@@ -26,11 +26,16 @@ export class TransformInterceptor<T>
     const statusCode = context.switchToHttp().getResponse().statusCode as number;
 
     return next.handle().pipe(
-      map((data) => ({
-        data,
-        statusCode,
-        timestamp: new Date().toISOString(),
-      })),
+      map((data) => {
+        if (statusCode === 204) {
+          return data;
+        }
+        return {
+          data,
+          statusCode,
+          timestamp: new Date().toISOString(),
+        };
+      }),
     );
   }
 }

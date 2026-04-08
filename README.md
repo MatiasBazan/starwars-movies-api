@@ -101,6 +101,27 @@ npm run test:watch
 
 A cron job runs the same sync automatically every day at **1:00 AM**.
 
+## Postman Collection
+
+The file `postman_collection.json` is included at the root of the project.
+
+**How to import:**
+
+1. Open Postman.
+2. Click **File → Import** (or press `Ctrl+O` / `Cmd+O`).
+3. Select `postman_collection.json` from the project root.
+4. The collection **"Star Wars Movies API"** will appear in your sidebar.
+
+**How to authenticate:**
+
+1. Run **POST /auth/login** (or **POST /auth/register**).
+2. Copy the `access_token` value from the response.
+3. Click the collection name → **Variables** tab.
+4. Paste the token into the `token` variable (Current Value column).
+5. All requests that require a Bearer token will pick it up automatically via `{{token}}`.
+
+---
+
 ## Swagger Documentation
 
 Available at: `http://localhost:3000/api/docs`
@@ -139,6 +160,7 @@ src/
 │   └── interceptors/      # transform.interceptor.ts
 ├── app.module.ts
 └── main.ts
+
 ```
 
 ## Environment Variables
