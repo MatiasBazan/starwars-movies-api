@@ -54,7 +54,8 @@ import { Movie } from './movies/entities/movie.entity';
                 ),
               }),
           entities: [User, Movie],
-          synchronize: !isProduction, // Only true in development
+          synchronize:
+            configService.get<string>('DB_SYNC') === 'true' || !isProduction,
         };
       },
     }),
