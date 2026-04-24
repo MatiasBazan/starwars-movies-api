@@ -1,17 +1,17 @@
 # Star Wars Movies API
 
-API REST backend construida con NestJS para gestionar películas de Star Wars, con autenticación JWT, control de acceso por roles y sincronización automática desde SWAPI.
+API REST backend construida con **NestJS** para gestionar películas de Star Wars, con autenticación JWT, control de acceso por roles y sincronización automática desde SWAPI.
 
-## Deploy en producción
+---
 
-El proyecto está configurado para ser desplegado de forma automática en **Render** usando el archivo `render.yaml` incluido.
+## Demo desplegada
 
 | | URL |
 |--|--|
-| **API Base** | *(Tu URL de Render, ej: https://starwars-movies-api.onrender.com)* |
-| **Documentación Swagger** | *(Tu URL de Render)/api/docs* |
+| **API Base** | https://starwars-movies-api.onrender.com |
+| **Documentación Swagger** | https://starwars-movies-api.onrender.com/api/docs |
 
-### Credenciales de prueba
+### Credenciales de prueba (ya registradas en producción)
 
 **Usuario regular** (rol: `user`):
 ```
@@ -30,7 +30,31 @@ password: Admin1234!
 conexa-admin-2026
 ```
 
-> **Tip:** Usá `POST /auth/login` con las credenciales de arriba, copiá el `access_token` y hacé clic en **Authorize** en Swagger.
+> **Tip:** Usá `POST /auth/login`, copiá el `access_token` y hacé clic en **Authorize** en Swagger.
+
+---
+
+## Características implementadas (Challenge SSR)
+
+- [x] Autenticación JWT con login/register
+- [x] Control de acceso por roles (USER / ADMIN)
+- [x] CRUD completo de películas
+- [x] Sincronización con SWAPI (endpoint + cron automático)
+- [x] Paginación y filtros en GET /movies
+- [x] Documentación Swagger/OpenAPI
+- [x] Rate limiting con Throttler
+- [x] Tests unitarios con Jest
+- [x] Colección Postman incluida
+- [x] Desplegada en producción (Render)
+
+### Extras implementados (Plus)
+
+- [x] **Rate Limiting** — Protección contra abusos con `@nestjs/throttler`
+- [x] **Helmet & Compression** — Seguridad y optimización HTTP
+- [x] **Cron automático** — Sincronización diaria con SWAPI a las 1:00 AM
+- [x] **Filtros por director, título y episodio** — Búsqueda flexible
+- [x] **Validaciones completas** — class-validator con mensajes claros
+- [x] **Logs y manejo de errores** — HttpExceptionFilter personalizado
 
 ## Tecnologías
 
@@ -156,8 +180,8 @@ El archivo `postman_collection.json` está incluido en la raíz del proyecto.
 
 ## Documentación Swagger
 
-- **Producción:** *(Tu URL de Render)/api/docs*
-- **Local:** `http://localhost:3000/api/docs`
+- **Producción:** https://starwars-movies-api.onrender.com/api/docs
+- **Local:** http://localhost:3000/api/docs
 
 Incluye autenticación Bearer — hacer clic en **Authorize** y pegar el JWT token.
 
