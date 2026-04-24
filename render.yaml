@@ -19,6 +19,4 @@ services:
 
 databases:
   - name: starwars-db
-    databaseName: starwars_movies
-    user: postgres
     plan: free
