@@ -20,7 +20,9 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async register(dto: RegisterDto): Promise<{ user: Omit<User, 'password'>; access_token: string }> {
+  async register(
+    dto: RegisterDto,
+  ): Promise<{ user: Omit<User, 'password'>; access_token: string }> {
     const existing = await this.usersService.findByEmail(dto.email);
     if (existing) {
       throw new ConflictException('Email already in use');
@@ -33,10 +35,15 @@ export class AuthService {
     });
     const access_token = this.generateToken(user);
     const { password: _pw, ...userWithoutPassword } = user;
-    return { user: userWithoutPassword as Omit<User, 'password'>, access_token };
+    return {
+      user: userWithoutPassword as Omit<User, 'password'>,
+      access_token,
+    };
   }
 
-  async login(dto: LoginDto): Promise<{ access_token: string; user: Omit<User, 'password'> }> {
+  async login(
+    dto: LoginDto,
+  ): Promise<{ access_token: string; user: Omit<User, 'password'> }> {
     const user = await this.usersService.findByEmail(dto.email);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
@@ -47,10 +54,15 @@ export class AuthService {
     }
     const access_token = this.generateToken(user);
     const { password: _pw, ...userWithoutPassword } = user;
-    return { access_token, user: userWithoutPassword as Omit<User, 'password'> };
+    return {
+      access_token,
+      user: userWithoutPassword as Omit<User, 'password'>,
+    };
   }
 
-  async registerAdmin(dto: RegisterAdminDto): Promise<{ user: Omit<User, 'password'>; access_token: string }> {
+  async registerAdmin(
+    dto: RegisterAdminDto,
+  ): Promise<{ user: Omit<User, 'password'>; access_token: string }> {
     const adminSecret = process.env.ADMIN_SECRET;
     if (!adminSecret || dto.adminSecret !== adminSecret) {
       throw new ForbiddenException('Invalid admin secret');
@@ -68,7 +80,10 @@ export class AuthService {
     });
     const access_token = this.generateToken(user);
     const { password: _pw, ...userWithoutPassword } = user;
-    return { user: userWithoutPassword as Omit<User, 'password'>, access_token };
+    return {
+      user: userWithoutPassword as Omit<User, 'password'>,
+      access_token,
+    };
   }
 
   private generateToken(user: User): string {

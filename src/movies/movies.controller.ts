@@ -39,9 +39,24 @@ export class MoviesController {
   @ApiOperation({ summary: 'Get all movies (public, paginated)' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
-  @ApiQuery({ name: 'title', required: false, type: String, description: 'Partial case-insensitive title filter' })
-  @ApiQuery({ name: 'director', required: false, type: String, description: 'Partial case-insensitive director filter' })
-  @ApiQuery({ name: 'episode', required: false, type: Number, description: 'Exact episodeId filter' })
+  @ApiQuery({
+    name: 'title',
+    required: false,
+    type: String,
+    description: 'Partial case-insensitive title filter',
+  })
+  @ApiQuery({
+    name: 'director',
+    required: false,
+    type: String,
+    description: 'Partial case-insensitive director filter',
+  })
+  @ApiQuery({
+    name: 'episode',
+    required: false,
+    type: Number,
+    description: 'Exact episodeId filter',
+  })
   @ApiResponse({ status: 200, description: 'List of movies' })
   findAll(
     @Query('page') page?: string,

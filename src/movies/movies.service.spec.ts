@@ -81,7 +81,9 @@ describe('MoviesService', () => {
 
       await service.findAll(1, 10, { title: 'hope' });
 
-      expect(qb.andWhere).toHaveBeenCalledWith('movie.title ILIKE :title', { title: '%hope%' });
+      expect(qb.andWhere).toHaveBeenCalledWith('movie.title ILIKE :title', {
+        title: '%hope%',
+      });
     });
 
     it('should filter by director using ILIKE', async () => {
@@ -90,7 +92,10 @@ describe('MoviesService', () => {
 
       await service.findAll(1, 10, { director: 'lucas' });
 
-      expect(qb.andWhere).toHaveBeenCalledWith('movie.director ILIKE :director', { director: '%lucas%' });
+      expect(qb.andWhere).toHaveBeenCalledWith(
+        'movie.director ILIKE :director',
+        { director: '%lucas%' },
+      );
     });
 
     it('should filter by episodeId exactly', async () => {
@@ -99,14 +104,20 @@ describe('MoviesService', () => {
 
       await service.findAll(1, 10, { episode: '4' });
 
-      expect(qb.andWhere).toHaveBeenCalledWith('movie.episodeId = :episodeId', { episodeId: 4 });
+      expect(qb.andWhere).toHaveBeenCalledWith('movie.episodeId = :episodeId', {
+        episodeId: 4,
+      });
     });
 
     it('should apply multiple filters together', async () => {
       const qb = createMockQueryBuilder([[mockMovie], 1]);
       (repo.createQueryBuilder as jest.Mock).mockReturnValue(qb);
 
-      await service.findAll(1, 10, { title: 'hope', director: 'lucas', episode: '4' });
+      await service.findAll(1, 10, {
+        title: 'hope',
+        director: 'lucas',
+        episode: '4',
+      });
 
       expect(qb.andWhere).toHaveBeenCalledTimes(3);
     });
@@ -124,7 +135,9 @@ describe('MoviesService', () => {
     it('should throw NotFoundException if movie does not exist', async () => {
       repo.findOne!.mockResolvedValue(null);
 
-      await expect(service.findOne('nonexistent')).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('nonexistent')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -155,7 +168,9 @@ describe('MoviesService', () => {
       repo.findOne!.mockResolvedValue(mockMovie);
       repo.save!.mockResolvedValue(updated);
 
-      const result = await service.update('uuid-1', { director: 'Someone Else' });
+      const result = await service.update('uuid-1', {
+        director: 'Someone Else',
+      });
 
       expect(result.director).toBe('Someone Else');
     });
@@ -168,9 +183,9 @@ describe('MoviesService', () => {
       );
       repo.save!.mockRejectedValue(dbError);
 
-      await expect(service.update('uuid-1', { title: 'A New Hope' })).rejects.toThrow(
-        ConflictException,
-      );
+      await expect(
+        service.update('uuid-1', { title: 'A New Hope' }),
+      ).rejects.toThrow(ConflictException);
     });
 
     it('should rethrow unknown errors from save', async () => {

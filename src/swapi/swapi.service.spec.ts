@@ -78,7 +78,9 @@ describe('SwapiService', () => {
         json: async () => mockFilmDetail,
       });
 
-    moviesService.upsertByExternalId.mockResolvedValue(mockUpsertedMovie as Movie);
+    moviesService.upsertByExternalId.mockResolvedValue(
+      mockUpsertedMovie as Movie,
+    );
 
     const result = await service.syncMovies();
 
@@ -101,7 +103,9 @@ describe('SwapiService', () => {
       .mockResolvedValueOnce(okResponse(mockFilmsList))
       .mockResolvedValueOnce(okResponse(mockFilmDetail));
 
-    moviesService.upsertByExternalId.mockResolvedValue(mockUpsertedMovie as Movie);
+    moviesService.upsertByExternalId.mockResolvedValue(
+      mockUpsertedMovie as Movie,
+    );
 
     await service.syncMovies();
     await service.syncMovies();

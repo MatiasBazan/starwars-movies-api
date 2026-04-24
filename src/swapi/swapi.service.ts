@@ -56,10 +56,13 @@ export class SwapiService {
       try {
         const detailResponse = await fetch(`${baseUrl}/films/${film.uid}`);
         if (!detailResponse.ok) {
-          this.logger.warn(`Failed to fetch film ${film.uid}: ${detailResponse.status}`);
+          this.logger.warn(
+            `Failed to fetch film ${film.uid}: ${detailResponse.status}`,
+          );
           continue;
         }
-        const detailData = (await detailResponse.json()) as SwapiFilmDetailResponse;
+        const detailData =
+          (await detailResponse.json()) as SwapiFilmDetailResponse;
         const props = detailData.result.properties;
 
         const movieData: Partial<Movie> = {

@@ -11,7 +11,9 @@ const mockMovie: Partial<Movie> = {
 };
 
 const mockMoviesService = {
-  findAll: jest.fn().mockResolvedValue({ data: [mockMovie], total: 1, page: 1, limit: 10 }),
+  findAll: jest
+    .fn()
+    .mockResolvedValue({ data: [mockMovie], total: 1, page: 1, limit: 10 }),
   findOne: jest.fn().mockResolvedValue(mockMovie),
   create: jest.fn().mockResolvedValue(mockMovie),
   update: jest.fn().mockResolvedValue(mockMovie),
@@ -19,7 +21,9 @@ const mockMoviesService = {
 };
 
 const mockSwapiService = {
-  syncMovies: jest.fn().mockResolvedValue({ synced: 6, message: 'Synced 6 movies' }),
+  syncMovies: jest
+    .fn()
+    .mockResolvedValue({ synced: 6, message: 'Synced 6 movies' }),
 };
 
 describe('MoviesController', () => {
@@ -39,7 +43,11 @@ describe('MoviesController', () => {
 
   it('findAll should call MoviesService.findAll with parsed page and limit', async () => {
     const result = await controller.findAll('1', '10');
-    expect(mockMoviesService.findAll).toHaveBeenCalledWith(1, 10, { title: undefined, director: undefined, episode: undefined });
+    expect(mockMoviesService.findAll).toHaveBeenCalledWith(1, 10, {
+      title: undefined,
+      director: undefined,
+      episode: undefined,
+    });
     expect(result.data).toHaveLength(1);
   });
 

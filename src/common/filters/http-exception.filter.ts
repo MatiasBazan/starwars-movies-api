@@ -16,14 +16,12 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const exceptionResponse = exception.getResponse();
 
     const message =
-      typeof exceptionResponse === 'object' &&
-      'message' in exceptionResponse
+      typeof exceptionResponse === 'object' && 'message' in exceptionResponse
         ? (exceptionResponse as Record<string, unknown>).message
         : exceptionResponse;
 
     const error =
-      typeof exceptionResponse === 'object' &&
-      'error' in exceptionResponse
+      typeof exceptionResponse === 'object' && 'error' in exceptionResponse
         ? (exceptionResponse as Record<string, unknown>).error
         : exception.name;
 

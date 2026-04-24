@@ -6,10 +6,7 @@ import { MoviesController } from './movies.controller';
 import { SwapiModule } from '../swapi/swapi.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Movie]),
-    forwardRef(() => SwapiModule),
-  ],
+  imports: [TypeOrmModule.forFeature([Movie]), forwardRef(() => SwapiModule)],
   providers: [MoviesService],
   controllers: [MoviesController],
   exports: [MoviesService],

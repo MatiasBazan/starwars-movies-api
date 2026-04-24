@@ -18,9 +18,13 @@ import { UsersModule } from '../users/users.module';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET') || 'your-super-secret-key-change-in-production',
+        secret:
+          configService.get<string>('JWT_SECRET') ||
+          'your-super-secret-key-change-in-production',
         signOptions: {
-          expiresIn: configService.get<string>('JWT_EXPIRATION', '1d') as `${number}${'s' | 'm' | 'h' | 'd' | 'w' | 'y'}` | number,
+          expiresIn: configService.get<string>('JWT_EXPIRATION', '1d') as
+            | `${number}${'s' | 'm' | 'h' | 'd' | 'w' | 'y'}`
+            | number,
         },
       }),
     }),

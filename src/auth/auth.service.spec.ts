@@ -1,4 +1,8 @@
-import { ConflictException, ForbiddenException, UnauthorizedException } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as bcrypt from 'bcryptjs';
@@ -117,13 +121,17 @@ describe('AuthService', () => {
     it('should throw ForbiddenException if ADMIN_SECRET env var is not set', async () => {
       delete process.env.ADMIN_SECRET;
 
-      await expect(service.registerAdmin(adminDto)).rejects.toThrow(ForbiddenException);
+      await expect(service.registerAdmin(adminDto)).rejects.toThrow(
+        ForbiddenException,
+      );
     });
 
     it('should throw ConflictException if email already exists', async () => {
       usersService.findByEmail.mockResolvedValue(mockUser);
 
-      await expect(service.registerAdmin(adminDto)).rejects.toThrow(ConflictException);
+      await expect(service.registerAdmin(adminDto)).rejects.toThrow(
+        ConflictException,
+      );
     });
   });
 

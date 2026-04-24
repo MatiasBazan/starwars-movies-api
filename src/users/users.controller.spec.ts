@@ -49,7 +49,9 @@ describe('UsersController', () => {
     it('should throw NotFoundException if user no longer exists', async () => {
       usersService.findById.mockResolvedValue(null);
 
-      await expect(controller.getMe({ id: 'uuid-1' })).rejects.toThrow(NotFoundException);
+      await expect(controller.getMe({ id: 'uuid-1' })).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

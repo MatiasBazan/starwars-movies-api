@@ -24,7 +24,11 @@ export class MoviesService {
     private readonly moviesRepository: Repository<Movie>,
   ) {}
 
-  async findAll(page = 1, limit = 10, filters: QueryMovieDto = {}): Promise<PaginatedMovies> {
+  async findAll(
+    page = 1,
+    limit = 10,
+    filters: QueryMovieDto = {},
+  ): Promise<PaginatedMovies> {
     const qb = this.moviesRepository
       .createQueryBuilder('movie')
       .orderBy('movie.createdAt', 'DESC')
@@ -35,10 +39,14 @@ export class MoviesService {
       qb.andWhere('movie.title ILIKE :title', { title: `%${filters.title}%` });
     }
     if (filters.director) {
-      qb.andWhere('movie.director ILIKE :director', { director: `%${filters.director}%` });
+      qb.andWhere('movie.director ILIKE :director', {
+        director: `%${filters.director}%`,
+      });
     }
     if (filters.episode !== undefined) {
-      qb.andWhere('movie.episodeId = :episodeId', { episodeId: parseInt(filters.episode, 10) });
+      qb.andWhere('movie.episodeId = :episodeId', {
+        episodeId: parseInt(filters.episode, 10),
+      });
     }
 
     const [data, total] = await qb.getManyAndCount();
@@ -62,7 +70,9 @@ export class MoviesService {
       where: { title: dto.title },
     });
     if (existing) {
-      throw new ConflictException(`Movie with title "${dto.title}" already exists`);
+      throw new ConflictException(
+        `Movie with title "${dto.title}" already exists`,
+      );
     }
     const movie = this.moviesRepository.create(dto);
     return this.moviesRepository.save(movie);
@@ -74,7 +84,10 @@ export class MoviesService {
     try {
       return await this.moviesRepository.save(movie);
     } catch (error) {
-      if (error instanceof QueryFailedError && (error as any).code === '23505') {
+      if (
+        error instanceof QueryFailedError &&
+        (error as any).code === '23505'
+      ) {
         throw new ConflictException('A movie with that title already exists');
       }
       throw error;

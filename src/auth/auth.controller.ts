@@ -23,7 +23,10 @@ export class AuthController {
   @Public()
   @Post('register-admin')
   @ApiOperation({ summary: 'Register a new admin user' })
-  @ApiResponse({ status: 201, description: 'Admin user registered successfully' })
+  @ApiResponse({
+    status: 201,
+    description: 'Admin user registered successfully',
+  })
   @ApiResponse({ status: 403, description: 'Invalid admin secret' })
   @ApiResponse({ status: 409, description: 'Email already in use' })
   registerAdmin(@Body() dto: RegisterAdminDto) {
