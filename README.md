@@ -4,10 +4,12 @@ API REST backend construida con NestJS para gestionar películas de Star Wars, c
 
 ## Deploy en producción
 
+El proyecto está configurado para ser desplegado de forma automática en **Render** usando el archivo `render.yaml` incluido.
+
 | | URL |
 |--|--|
-| **API Base** | https://starwars-movies-api.up.railway.app |
-| **Documentación Swagger** | https://starwars-movies-api.up.railway.app/api/docs |
+| **API Base** | *(Tu URL de Render, ej: https://starwars-movies-api.onrender.com)* |
+| **Documentación Swagger** | *(Tu URL de Render)/api/docs* |
 
 ### Credenciales de prueba
 
@@ -40,6 +42,8 @@ conexa-admin-2026
 - **@nestjs/swagger** — Documentación Swagger/OpenAPI
 - **bcryptjs** — Hashing de contraseñas
 - **@nestjs/schedule** — Cron jobs para sincronización automática con SWAPI
+- **@nestjs/throttler** — Rate Limiting (Protección contra abusos)
+- **Helmet & Compression** — Seguridad y optimización de respuestas HTTP
 
 ## Requisitos previos
 
@@ -152,7 +156,7 @@ El archivo `postman_collection.json` está incluido en la raíz del proyecto.
 
 ## Documentación Swagger
 
-- **Producción:** https://starwars-movies-api.up.railway.app/api/docs
+- **Producción:** *(Tu URL de Render)/api/docs*
 - **Local:** `http://localhost:3000/api/docs`
 
 Incluye autenticación Bearer — hacer clic en **Authorize** y pegar el JWT token.
