@@ -1,3 +1,4 @@
+import { plainToInstance } from 'class-transformer';
 import {
   Body,
   Controller,
@@ -21,6 +22,8 @@ import { SwapiService } from '../swapi/swapi.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { SearchMoviesDto } from './dto/search-movies.dto';
+import { MovieListItemDto } from './dto/movie-list-item.dto';
+import { MovieDetailDto } from './dto/movie-detail.dto';
 import { Public } from '../auth/decorators/public.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../users/entities/role.enum';
@@ -37,18 +40,27 @@ export class MoviesController {
   @Public()
   @Get()
   @ApiOperation({ summary: 'Get all movies (public, paginated)' })
-  @ApiResponse({ status: 200, description: 'List of movies' })
-  findAll(@Query() query: SearchMoviesDto) {
-    return this.moviesService.findAll(query);
+  @ApiResponse({ status: 200, type: [MovieListItemDto] })
+  async findAll(@Query() query: SearchMoviesDto) {
+    const result = await this.moviesService.findAll(query);
+    return {
+      ...result,
+      data: plainToInstance(MovieListItemDto, result.data, {
+        excludeExtraneousValues: true,
+      }),
+    };
   }
 
   @Get(':id')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get movie by ID (authenticated)' })
-  @ApiResponse({ status: 200, description: 'Movie detail' })
+  @ApiResponse({ status: 200, type: MovieDetailDto })
   @ApiResponse({ status: 404, description: 'Movie not found' })
-  findOne(@Param('id') id: string) {
-    return this.moviesService.findOne(id);
+  async findOne(@Param('id') id: string): Promise<MovieDetailDto> {
+    const movie = await this.moviesService.findOne(id);
+    return plainToInstance(MovieDetailDto, movie, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Post()

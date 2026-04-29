@@ -30,6 +30,13 @@ export class MoviesService {
 
     const qb = this.moviesRepository
       .createQueryBuilder('movie')
+      .select([
+        'movie.id',
+        'movie.title',
+        'movie.episodeId',
+        'movie.releaseDate',
+        'movie.director',
+      ])
       .orderBy(sortColumn, direction)
       .skip((q.page - 1) * q.limit)
       .take(q.limit);
