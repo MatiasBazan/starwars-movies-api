@@ -24,10 +24,8 @@ import { Movie } from './movies/entities/movie.entity';
     }),
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
     ThrottlerModule.forRoot([
-      {
-        ttl: 60000,
-        limit: 100,
-      },
+      { name: 'medium', ttl: 60000, limit: 20 },
+      { name: 'auth', ttl: 60000, limit: 5 },
     ]),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
