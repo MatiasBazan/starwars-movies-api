@@ -8,7 +8,7 @@ import { QueryFailedError, Repository } from 'typeorm';
 import { Movie } from './entities/movie.entity';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
-import { QueryMovieDto } from './dto/query-movie.dto';
+import { SearchMoviesDto } from './dto/search-movies.dto';
 
 export interface PaginatedMovies {
   data: Movie[];
@@ -24,33 +24,28 @@ export class MoviesService {
     private readonly moviesRepository: Repository<Movie>,
   ) {}
 
-  async findAll(
-    page = 1,
-    limit = 10,
-    filters: QueryMovieDto = {},
-  ): Promise<PaginatedMovies> {
+  async findAll(q: SearchMoviesDto): Promise<PaginatedMovies> {
+    const sortColumn = `movie.${q.sortBy}`;
+    const direction = q.order.toUpperCase() as 'ASC' | 'DESC';
+
     const qb = this.moviesRepository
       .createQueryBuilder('movie')
-      .orderBy('movie.createdAt', 'DESC')
-      .skip((page - 1) * limit)
-      .take(limit);
+      .orderBy(sortColumn, direction)
+      .skip((q.page - 1) * q.limit)
+      .take(q.limit);
 
-    if (filters.title) {
-      qb.andWhere('movie.title ILIKE :title', { title: `%${filters.title}%` });
+    if (q.search) {
+      qb.andWhere('movie.title ILIKE :s', { s: `%${q.search}%` });
     }
-    if (filters.director) {
-      qb.andWhere('movie.director ILIKE :director', {
-        director: `%${filters.director}%`,
-      });
+    if (q.director) {
+      qb.andWhere('movie.director ILIKE :d', { d: `%${q.director}%` });
     }
-    if (filters.episode !== undefined) {
-      qb.andWhere('movie.episodeId = :episodeId', {
-        episodeId: parseInt(filters.episode, 10),
-      });
+    if (q.episode !== undefined) {
+      qb.andWhere('movie.episodeId = :ep', { ep: q.episode });
     }
 
     const [data, total] = await qb.getManyAndCount();
-    return { data, total, page, limit };
+    return { data, total, page: q.page, limit: q.limit };
   }
 
   async findOne(id: string): Promise<Movie> {

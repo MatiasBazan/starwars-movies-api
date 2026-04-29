@@ -13,7 +13,6 @@ import {
 import {
   ApiBearerAuth,
   ApiOperation,
-  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -21,6 +20,7 @@ import { MoviesService } from './movies.service';
 import { SwapiService } from '../swapi/swapi.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
+import { SearchMoviesDto } from './dto/search-movies.dto';
 import { Public } from '../auth/decorators/public.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../users/entities/role.enum';
@@ -37,39 +37,9 @@ export class MoviesController {
   @Public()
   @Get()
   @ApiOperation({ summary: 'Get all movies (public, paginated)' })
-  @ApiQuery({ name: 'page', required: false, type: Number })
-  @ApiQuery({ name: 'limit', required: false, type: Number })
-  @ApiQuery({
-    name: 'title',
-    required: false,
-    type: String,
-    description: 'Partial case-insensitive title filter',
-  })
-  @ApiQuery({
-    name: 'director',
-    required: false,
-    type: String,
-    description: 'Partial case-insensitive director filter',
-  })
-  @ApiQuery({
-    name: 'episode',
-    required: false,
-    type: Number,
-    description: 'Exact episodeId filter',
-  })
   @ApiResponse({ status: 200, description: 'List of movies' })
-  findAll(
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
-    @Query('title') title?: string,
-    @Query('director') director?: string,
-    @Query('episode') episode?: string,
-  ) {
-    return this.moviesService.findAll(
-      page ? parseInt(page, 10) : 1,
-      limit ? parseInt(limit, 10) : 10,
-      { title, director, episode },
-    );
+  findAll(@Query() query: SearchMoviesDto) {
+    return this.moviesService.findAll(query);
   }
 
   @Get(':id')

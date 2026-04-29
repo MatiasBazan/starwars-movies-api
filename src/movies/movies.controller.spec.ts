@@ -3,6 +3,7 @@ import { MoviesController } from './movies.controller';
 import { MoviesService } from './movies.service';
 import { SwapiService } from '../swapi/swapi.service';
 import { Movie } from './entities/movie.entity';
+import { SearchMoviesDto } from './dto/search-movies.dto';
 
 const mockMovie: Partial<Movie> = {
   id: 'uuid-1',
@@ -41,13 +42,15 @@ describe('MoviesController', () => {
     controller = module.get<MoviesController>(MoviesController);
   });
 
-  it('findAll should call MoviesService.findAll with parsed page and limit', async () => {
-    const result = await controller.findAll('1', '10');
-    expect(mockMoviesService.findAll).toHaveBeenCalledWith(1, 10, {
-      title: undefined,
-      director: undefined,
-      episode: undefined,
-    });
+  it('findAll should call MoviesService.findAll with query dto', async () => {
+    const query: SearchMoviesDto = {
+      page: 1,
+      limit: 10,
+      sortBy: 'episodeId',
+      order: 'asc',
+    };
+    const result = await controller.findAll(query);
+    expect(mockMoviesService.findAll).toHaveBeenCalledWith(query);
     expect(result.data).toHaveLength(1);
   });
 

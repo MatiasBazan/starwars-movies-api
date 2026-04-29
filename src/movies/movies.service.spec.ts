@@ -4,6 +4,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { QueryFailedError, Repository } from 'typeorm';
 import { MoviesService } from './movies.service';
 import { Movie } from './entities/movie.entity';
+import { SearchMoviesDto } from './dto/search-movies.dto';
 
 const mockMovie: Movie = {
   id: 'uuid-1',
@@ -27,6 +28,7 @@ type MockRepository<T> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 
 const createMockQueryBuilder = (result: [Movie[], number]) => {
   const qb: any = {
+    select: jest.fn().mockReturnThis(),
     orderBy: jest.fn().mockReturnThis(),
     skip: jest.fn().mockReturnThis(),
     take: jest.fn().mockReturnThis(),
@@ -43,6 +45,15 @@ const createMockRepository = <T>(): MockRepository<T> => ({
   remove: jest.fn(),
   createQueryBuilder: jest.fn(),
 });
+
+const baseQuery = (overrides: Partial<SearchMoviesDto> = {}): SearchMoviesDto =>
+  ({
+    page: 1,
+    limit: 10,
+    sortBy: 'episodeId',
+    order: 'asc',
+    ...overrides,
+  }) as SearchMoviesDto;
 
 describe('MoviesService', () => {
   let service: MoviesService;
@@ -66,23 +77,24 @@ describe('MoviesService', () => {
       const qb = createMockQueryBuilder([[mockMovie], 1]);
       (repo.createQueryBuilder as jest.Mock).mockReturnValue(qb);
 
-      const result = await service.findAll(1, 10);
+      const result = await service.findAll(baseQuery());
 
       expect(result.data).toHaveLength(1);
       expect(result.total).toBe(1);
       expect(result.page).toBe(1);
       expect(result.limit).toBe(10);
       expect(qb.andWhere).not.toHaveBeenCalled();
+      expect(qb.orderBy).toHaveBeenCalledWith('movie.episodeId', 'ASC');
     });
 
-    it('should filter by title using ILIKE', async () => {
+    it('should filter by search using ILIKE', async () => {
       const qb = createMockQueryBuilder([[mockMovie], 1]);
       (repo.createQueryBuilder as jest.Mock).mockReturnValue(qb);
 
-      await service.findAll(1, 10, { title: 'hope' });
+      await service.findAll(baseQuery({ search: 'hope' }));
 
-      expect(qb.andWhere).toHaveBeenCalledWith('movie.title ILIKE :title', {
-        title: '%hope%',
+      expect(qb.andWhere).toHaveBeenCalledWith('movie.title ILIKE :s', {
+        s: '%hope%',
       });
     });
 
@@ -90,22 +102,21 @@ describe('MoviesService', () => {
       const qb = createMockQueryBuilder([[mockMovie], 1]);
       (repo.createQueryBuilder as jest.Mock).mockReturnValue(qb);
 
-      await service.findAll(1, 10, { director: 'lucas' });
+      await service.findAll(baseQuery({ director: 'lucas' }));
 
-      expect(qb.andWhere).toHaveBeenCalledWith(
-        'movie.director ILIKE :director',
-        { director: '%lucas%' },
-      );
+      expect(qb.andWhere).toHaveBeenCalledWith('movie.director ILIKE :d', {
+        d: '%lucas%',
+      });
     });
 
     it('should filter by episodeId exactly', async () => {
       const qb = createMockQueryBuilder([[mockMovie], 1]);
       (repo.createQueryBuilder as jest.Mock).mockReturnValue(qb);
 
-      await service.findAll(1, 10, { episode: '4' });
+      await service.findAll(baseQuery({ episode: 4 }));
 
-      expect(qb.andWhere).toHaveBeenCalledWith('movie.episodeId = :episodeId', {
-        episodeId: 4,
+      expect(qb.andWhere).toHaveBeenCalledWith('movie.episodeId = :ep', {
+        ep: 4,
       });
     });
 
@@ -113,11 +124,9 @@ describe('MoviesService', () => {
       const qb = createMockQueryBuilder([[mockMovie], 1]);
       (repo.createQueryBuilder as jest.Mock).mockReturnValue(qb);
 
-      await service.findAll(1, 10, {
-        title: 'hope',
-        director: 'lucas',
-        episode: '4',
-      });
+      await service.findAll(
+        baseQuery({ search: 'hope', director: 'lucas', episode: 4 }),
+      );
 
       expect(qb.andWhere).toHaveBeenCalledTimes(3);
     });
