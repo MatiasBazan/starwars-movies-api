@@ -43,7 +43,8 @@ describe('UsersController', () => {
       const result = await controller.getMe({ id: 'uuid-1' });
 
       expect(result).toEqual(mockUser);
-      expect(usersService.findById).toHaveBeenCalledWith('uuid-1');
+      const findByIdSpy = usersService.findById;
+      expect(findByIdSpy).toHaveBeenCalledWith('uuid-1');
     });
 
     it('should throw NotFoundException if user no longer exists', async () => {

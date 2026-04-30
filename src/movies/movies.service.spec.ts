@@ -26,17 +26,25 @@ const mockMovie: Movie = {
 
 type MockRepository<T> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 
-const createMockQueryBuilder = (result: [Movie[], number]) => {
-  const qb: any = {
-    select: jest.fn().mockReturnThis(),
-    orderBy: jest.fn().mockReturnThis(),
-    skip: jest.fn().mockReturnThis(),
-    take: jest.fn().mockReturnThis(),
-    andWhere: jest.fn().mockReturnThis(),
-    getManyAndCount: jest.fn().mockResolvedValue(result),
-  };
-  return qb;
-};
+interface MockQueryBuilder {
+  select: jest.Mock;
+  orderBy: jest.Mock;
+  skip: jest.Mock;
+  take: jest.Mock;
+  andWhere: jest.Mock;
+  getManyAndCount: jest.Mock;
+}
+
+const createMockQueryBuilder = (
+  result: [Movie[], number],
+): MockQueryBuilder => ({
+  select: jest.fn().mockReturnThis(),
+  orderBy: jest.fn().mockReturnThis(),
+  skip: jest.fn().mockReturnThis(),
+  take: jest.fn().mockReturnThis(),
+  andWhere: jest.fn().mockReturnThis(),
+  getManyAndCount: jest.fn().mockResolvedValue(result),
+});
 
 const createMockRepository = <T>(): MockRepository<T> => ({
   findOne: jest.fn(),

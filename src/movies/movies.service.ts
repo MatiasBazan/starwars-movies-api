@@ -88,7 +88,7 @@ export class MoviesService {
     } catch (error) {
       if (
         error instanceof QueryFailedError &&
-        (error as any).code === '23505'
+        (error as QueryFailedError & { code?: string }).code === '23505'
       ) {
         throw new ConflictException('A movie with that title already exists');
       }

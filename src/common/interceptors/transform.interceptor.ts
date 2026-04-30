@@ -4,7 +4,7 @@ import {
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
-import { Request } from 'express';
+import { Response } from 'express';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -17,18 +17,18 @@ export interface TransformedResponse<T> {
 @Injectable()
 export class TransformInterceptor<T> implements NestInterceptor<
   T,
-  TransformedResponse<T>
+  TransformedResponse<T> | T
 > {
   intercept(
     context: ExecutionContext,
-    next: CallHandler,
-  ): Observable<TransformedResponse<T>> {
-    const request = context.switchToHttp().getRequest<Request>();
-    const statusCode = context.switchToHttp().getResponse()
-      .statusCode as number;
+    next: CallHandler<T>,
+  ): Observable<TransformedResponse<T> | T> {
+    const statusCode = context
+      .switchToHttp()
+      .getResponse<Response>().statusCode;
 
     return next.handle().pipe(
-      map((data) => {
+      map((data): TransformedResponse<T> | T => {
         if (statusCode === 204) {
           return data;
         }

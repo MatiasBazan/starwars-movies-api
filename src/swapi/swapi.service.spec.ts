@@ -71,11 +71,11 @@ describe('SwapiService', () => {
     (global.fetch as jest.Mock)
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => mockFilmsList,
+        json: () => Promise.resolve(mockFilmsList),
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => mockFilmDetail,
+        json: () => Promise.resolve(mockFilmDetail),
       });
 
     moviesService.upsertByExternalId.mockResolvedValue(
@@ -85,7 +85,8 @@ describe('SwapiService', () => {
     const result = await service.syncMovies();
 
     expect(result.synced).toBe(1);
-    expect(moviesService.upsertByExternalId).toHaveBeenCalledWith(
+    const upsertSpy = moviesService.upsertByExternalId;
+    expect(upsertSpy).toHaveBeenCalledWith(
       '1',
       expect.objectContaining({ title: 'A New Hope' }),
     );
@@ -94,7 +95,7 @@ describe('SwapiService', () => {
   it('should not duplicate movies on re-sync (upsert behavior)', async () => {
     const okResponse = (body: unknown) => ({
       ok: true,
-      json: async () => body,
+      json: () => Promise.resolve(body),
     });
 
     (global.fetch as jest.Mock)
@@ -110,14 +111,15 @@ describe('SwapiService', () => {
     await service.syncMovies();
     await service.syncMovies();
 
-    expect(moviesService.upsertByExternalId).toHaveBeenCalledTimes(2);
+    const upsertSpy = moviesService.upsertByExternalId;
+    expect(upsertSpy).toHaveBeenCalledTimes(2);
   });
 
   it('should handle SWAPI API errors gracefully', async () => {
     (global.fetch as jest.Mock)
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => mockFilmsList,
+        json: () => Promise.resolve(mockFilmsList),
       })
       .mockResolvedValueOnce({
         ok: false,
@@ -127,6 +129,7 @@ describe('SwapiService', () => {
     const result = await service.syncMovies();
 
     expect(result.synced).toBe(0);
-    expect(moviesService.upsertByExternalId).not.toHaveBeenCalled();
+    const upsertSpy = moviesService.upsertByExternalId;
+    expect(upsertSpy).not.toHaveBeenCalled();
   });
 });
